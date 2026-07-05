@@ -83,10 +83,13 @@ nl2sql-ai/
 │   └── test_validator.py
 │
 ├── templates/
+│   └── _navbar.html
 │   └── index.html                # Main web UI template
 │
+│── favicon.svg
 ├── static/
 │   ├── css/style.css
+│   ├── images/ewu-logo.png
 │   └── js/app.js
 │
 ├── data/
