@@ -1,28 +1,28 @@
 /* nl2sql — main application logic */
 
-const dropZone      = document.getElementById("drop-zone");
-const fileInput     = document.getElementById("file-input");
-const uploadInfo    = document.getElementById("upload-info");
+const dropZone = document.getElementById("drop-zone");
+const fileInput = document.getElementById("file-input");
+const uploadInfo = document.getElementById("upload-info");
 const uploadFilename = document.getElementById("upload-filename");
-const uploadMeta    = document.getElementById("upload-meta");
-const changeBtn     = document.getElementById("change-file-btn");
-const querySection  = document.getElementById("query-section");
+const uploadMeta = document.getElementById("upload-meta");
+const changeBtn = document.getElementById("change-file-btn");
+const querySection = document.getElementById("query-section");
 const questionInput = document.getElementById("question-input");
-const askBtn        = document.getElementById("ask-btn");
-const sqlBlock      = document.getElementById("sql-block");
-const sqlOutput     = document.getElementById("sql-output");
-const intentLabel   = document.getElementById("intent-label");
-const errorBox      = document.getElementById("error-box");
-const resultsBlock  = document.getElementById("results-block");
-const resultsMeta   = document.getElementById("results-meta");
-const resultsThead  = document.getElementById("results-thead");
-const resultsTbody  = document.getElementById("results-tbody");
+const askBtn = document.getElementById("ask-btn");
+const sqlBlock = document.getElementById("sql-block");
+const sqlOutput = document.getElementById("sql-output");
+const intentLabel = document.getElementById("intent-label");
+const errorBox = document.getElementById("error-box");
+const resultsBlock = document.getElementById("results-block");
+const resultsMeta = document.getElementById("results-meta");
+const resultsThead = document.getElementById("results-thead");
+const resultsTbody = document.getElementById("results-tbody");
 
 // ── File upload ──────────────────────────────────────────────────────────────
 
 dropZone.addEventListener("click", () => fileInput.click());
 
-dropZone.addEventListener("dragover", e => {
+dropZone.addEventListener("dragover", (e) => {
   e.preventDefault();
   dropZone.classList.add("dragover");
 });
@@ -31,7 +31,7 @@ dropZone.addEventListener("dragleave", () => {
   dropZone.classList.remove("dragover");
 });
 
-dropZone.addEventListener("drop", e => {
+dropZone.addEventListener("drop", (e) => {
   e.preventDefault();
   dropZone.classList.remove("dragover");
   const file = e.dataTransfer.files[0];
@@ -42,16 +42,23 @@ fileInput.addEventListener("change", () => {
   if (fileInput.files[0]) uploadFile(fileInput.files[0]);
 });
 
-changeBtn.addEventListener("click", e => {
+changeBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   fileInput.click();
 });
 
 function uploadFile(file) {
   document.getElementById("global-error").style.display = "none";
+  const fileName = file.name.toLowerCase();
 
-  if (!file.name.toLowerCase().endsWith(".csv")) {
-    showGlobalError("Only CSV files are supported.");
+  if (
+    !fileName.endsWith(".csv") &&
+    !fileName.endsWith(".xlsx") &&
+    !fileName.endsWith(".xls")
+  ) {
+    showGlobalError(
+      "Only CSV and Excel (.csv, .xlsx, .xls) files are supported.",
+    );
     return;
   }
 
@@ -66,8 +73,8 @@ function uploadFile(file) {
   form.append("file", file);
 
   fetch("/upload", { method: "POST", body: form })
-    .then(r => r.json())
-    .then(data => {
+    .then((r) => r.json())
+    .then((data) => {
       if (data.error) {
         resetUpload();
         showGlobalError(data.error);
@@ -99,23 +106,38 @@ function renderPreview(columns, rows, totalRows) {
     `Showing first <strong>${rows.length}</strong> of <strong>${totalRows.toLocaleString()}</strong> rows`;
 
   document.getElementById("preview-thead").innerHTML =
-    "<tr>" + columns.map(c => `<th>${escHtml(String(c))}</th>`).join("") + "</tr>";
+    "<tr>" +
+    columns.map((c) => `<th>${escHtml(String(c))}</th>`).join("") +
+    "</tr>";
 
-  document.getElementById("preview-tbody").innerHTML = rows.map(row =>
-    "<tr>" + row.map(cell =>
-      `<td>${escHtml(cell === null || cell === undefined ? "" : String(cell))}</td>`
-    ).join("") + "</tr>"
-  ).join("");
+  document.getElementById("preview-tbody").innerHTML = rows
+    .map(
+      (row) =>
+        "<tr>" +
+        row
+          .map(
+            (cell) =>
+              `<td>${escHtml(cell === null || cell === undefined ? "" : String(cell))}</td>`,
+          )
+          .join("") +
+        "</tr>",
+    )
+    .join("");
 }
 
 // ── Query ────────────────────────────────────────────────────────────────────
 
 askBtn.addEventListener("click", runQuery);
-questionInput.addEventListener("keydown", e => { if (e.key === "Enter") runQuery(); });
+questionInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") runQuery();
+});
 
 function runQuery() {
   const question = questionInput.value.trim();
-  if (!question) { questionInput.focus(); return; }
+  if (!question) {
+    questionInput.focus();
+    return;
+  }
 
   askBtn.disabled = true;
   askBtn.innerHTML = '<span class="spinner"></span>Running…';
@@ -126,8 +148,8 @@ function runQuery() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ question }),
   })
-    .then(r => r.json())
-    .then(data => {
+    .then((r) => r.json())
+    .then((data) => {
       askBtn.disabled = false;
       askBtn.textContent = "Ask";
 
@@ -147,8 +169,7 @@ function runQuery() {
       } else {
         resultsBlock.style.display = "block";
         resultsMeta.innerHTML = "<strong>0</strong> rows returned.";
-        resultsTbody.innerHTML =
-          `<tr><td colspan="99" class="no-results">No results found.</td></tr>`;
+        resultsTbody.innerHTML = `<tr><td colspan="99" class="no-results">No results found.</td></tr>`;
       }
     })
     .catch(() => {
@@ -160,21 +181,29 @@ function runQuery() {
 
 function renderTable(columns, rows, count) {
   resultsBlock.style.display = "block";
-  resultsMeta.innerHTML =
-    `<strong>${count.toLocaleString()}</strong> row${count !== 1 ? "s" : ""} returned.`;
+  resultsMeta.innerHTML = `<strong>${count.toLocaleString()}</strong> row${count !== 1 ? "s" : ""} returned.`;
 
   resultsThead.innerHTML =
-    "<tr>" + columns.map(c => `<th>${escHtml(String(c))}</th>`).join("") + "</tr>";
+    "<tr>" +
+    columns.map((c) => `<th>${escHtml(String(c))}</th>`).join("") +
+    "</tr>";
 
   if (rows.length === 0) {
-    resultsTbody.innerHTML =
-      `<tr><td colspan="${columns.length}" class="no-results">No results found.</td></tr>`;
+    resultsTbody.innerHTML = `<tr><td colspan="${columns.length}" class="no-results">No results found.</td></tr>`;
   } else {
-    resultsTbody.innerHTML = rows.map(row =>
-      "<tr>" + row.map(cell =>
-        `<td>${escHtml(cell === null ? "NULL" : String(cell))}</td>`
-      ).join("") + "</tr>"
-    ).join("");
+    resultsTbody.innerHTML = rows
+      .map(
+        (row) =>
+          "<tr>" +
+          row
+            .map(
+              (cell) =>
+                `<td>${escHtml(cell === null ? "NULL" : String(cell))}</td>`,
+            )
+            .join("") +
+          "</tr>",
+      )
+      .join("");
   }
 }
 
@@ -211,32 +240,37 @@ function escHtml(str) {
 }
 
 // ── Logo — click to reload ────────────────────────────────────────────────────
-document.getElementById("logo-btn").addEventListener("click", () => window.location.reload());
+document
+  .getElementById("logo-btn")
+  .addEventListener("click", () => window.location.reload());
 
 // ── Hamburger menu (mobile) ───────────────────────────────────────────────────
-const navbar      = document.getElementById("navbar");
-const hamburger   = document.getElementById("nav-hamburger");
+const navbar = document.getElementById("navbar");
+const hamburger = document.getElementById("nav-hamburger");
 
 function closeNav() {
   navbar.classList.remove("nav-open");
   hamburger.setAttribute("aria-expanded", "false");
 }
 
-hamburger.addEventListener("click", e => {
+hamburger.addEventListener("click", (e) => {
   e.stopPropagation();
   const isOpen = navbar.classList.toggle("nav-open");
   hamburger.setAttribute("aria-expanded", String(isOpen));
 });
 
 // Close when a nav-link button is clicked on mobile
-document.getElementById("nav-links").querySelectorAll("button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    if (window.innerWidth <= 640) closeNav();
+document
+  .getElementById("nav-links")
+  .querySelectorAll("button")
+  .forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (window.innerWidth <= 640) closeNav();
+    });
   });
-});
 
 // Close on outside click
-document.addEventListener("click", e => {
+document.addEventListener("click", (e) => {
   if (!navbar.contains(e.target)) closeNav();
 });
 
@@ -250,22 +284,28 @@ function closeModal(id) {
   document.getElementById(id).classList.remove("open");
 }
 
-document.getElementById("about-btn").addEventListener("click", () => openModal("about-modal"));
-document.getElementById("help-btn").addEventListener("click", () => openModal("help-modal"));
+document
+  .getElementById("about-btn")
+  .addEventListener("click", () => openModal("about-modal"));
+document
+  .getElementById("help-btn")
+  .addEventListener("click", () => openModal("help-modal"));
 
-document.querySelectorAll(".modal-close").forEach(btn => {
+document.querySelectorAll(".modal-close").forEach((btn) => {
   btn.addEventListener("click", () => closeModal(btn.dataset.close));
 });
 
-document.querySelectorAll(".modal-overlay").forEach(overlay => {
-  overlay.addEventListener("click", e => {
+document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+  overlay.addEventListener("click", (e) => {
     if (e.target === overlay) closeModal(overlay.id);
   });
 });
 
-document.addEventListener("keydown", e => {
+document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeNav();
-    document.querySelectorAll(".modal-overlay.open").forEach(o => closeModal(o.id));
+    document
+      .querySelectorAll(".modal-overlay.open")
+      .forEach((o) => closeModal(o.id));
   }
 });

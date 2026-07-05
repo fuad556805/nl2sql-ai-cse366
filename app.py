@@ -1,7 +1,7 @@
 """
 Flask web server for the NL2SQL AI application.
 
-Handles CSV upload, schema extraction, and natural language query execution.
+Handles CSV and Excel upload, schema extraction, and natural language query execution.
 Uses PostgreSQL in production (DATABASE_URL or NEON_DATABASE_URL env var)
 and SQLite as a local development fallback.
 """
@@ -68,7 +68,7 @@ def simulator():
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    """Accept a CSV file upload and return the schema and a row preview."""
+    """Accept a CSV or Excel file upload and return the schema and a row preview."""
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
@@ -76,10 +76,24 @@ def upload():
     if not f.filename:
         return jsonify({"error": "Empty filename"}), 400
 
-    if not f.filename.lower().endswith(".csv"):
-        return jsonify({"error": "Only CSV files are supported"}), 400
+    filename = f.filename.lower()
 
-    tmp = tempfile.NamedTemporaryFile(suffix=".csv", delete=False, prefix="nl2sql_")
+    if not (
+        filename.endswith(".csv") or
+        filename.endswith(".xlsx") or
+        filename.endswith(".xls")
+    ):
+        return jsonify({
+            "error": "Only CSV and Excel (.csv, .xlsx, .xls) files are supported."
+        }), 400
+
+    extension = os.path.splitext(f.filename)[1].lower()
+
+    tmp = tempfile.NamedTemporaryFile(
+        suffix=extension,
+        delete=False,
+        prefix="nl2sql_"
+    )
     try:
         f.save(tmp.name)
         tmp.close()
@@ -90,7 +104,7 @@ def upload():
         except Exception as e:
             print(f"Upload error: {e}")
             return jsonify({
-                "error": "Failed to parse CSV. Ensure the file is valid with a header row."
+                "error": "Failed to parse the dataset. Ensure the CSV or Excel file is valid and contains a header row."
             }), 500
     finally:
         try:
@@ -115,7 +129,7 @@ def upload():
 def ask():
     """Translate a natural language question to SQL, execute it, and return results."""
     if _state["df"] is None:
-        return jsonify({"error": "No dataset loaded. Please upload a CSV first."}), 400
+        return jsonify({"error": "No dataset loaded. Please upload a CSV or Excel file first."}), 400
 
     if _state["model"] is None:
         return jsonify({"error": "Model not loaded. Run: python3 models/train_intent.py"}), 500

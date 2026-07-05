@@ -1,8 +1,8 @@
 """
 Interactive CLI for the NL2SQL pipeline.
 
-Loads a CSV dataset and ML model once, then accepts repeated natural language
-questions until the user exits or switches to a different CSV file.
+Loads a CSV or Excel dataset and ML model once, then accepts repeated natural language
+questions until the user exits or switches to a different dataset.
 """
 
 import sys
@@ -53,7 +53,10 @@ def run_pipeline(df, schema, question, model, vectorizer,
 def main():
     print("=== NL to SQL AI — Interactive Mode ===")
 
-    csv_path = input("CSV file path (default: data/sample.csv): ").strip()
+    file_path = input("Dataset file path (CSV/Excel) (default: data/sample.csv): ").strip()
+
+    if not file_path:
+        file_path = "data/sample.csv"
     if not csv_path:
         csv_path = "data/sample.csv"
 
@@ -61,7 +64,7 @@ def main():
     table_name = "data"
 
     try:
-        df = load_dataset(csv_path, db_path, table_name)
+        df = load_dataset(file_path, db_path, table_name)
     except FileNotFoundError as e:
         print("Error:", e)
         return
@@ -78,7 +81,7 @@ def main():
         return
 
     print("\nAsk questions about your data. Type 'exit' to quit.")
-    print("Type 'change_csv' to load a different file.\n")
+    print("Type 'change_dataset' to load a different CSV or Excel file.\n")
 
     while True:
         try:
@@ -90,19 +93,15 @@ def main():
         if not question:
             continue
 
-        if question.lower() in ("exit", "quit", "q"):
-            print("Goodbye!")
-            break
-
-        if question.lower() == "change_csv":
-            new_csv = input("New CSV file path: ").strip()
-            if new_csv:
+        if question.lower() in ("change_dataset", "change_csv"):
+            new_file = input("New dataset file path (CSV/Excel): ").strip()
+            if new_file:
                 try:
-                    df     = load_dataset(new_csv, db_path, table_name)
+                    df = load_dataset(new_file, db_path, table_name)
                     schema = read_schema(df)
                     print("Dataset updated.")
                 except Exception as e:
-                    print("Error loading CSV:", e)
+                    print("Error loading dataset:", e)
             continue
 
         run_pipeline(df, schema, question, model, vectorizer, db_path, table_name)

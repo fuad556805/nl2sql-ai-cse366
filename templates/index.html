@@ -162,7 +162,7 @@
         <h2>Help &amp; Tips</h2>
         <p><strong>1. Upload a dataset</strong></p>
         <ul>
-          <li>Drag &amp; drop or click to browse a <code>.csv</code> file.</li>
+          <li>Drag &amp; drop or click to browse a <code>.csv</code>, <code>.xlsx</code>, or <code>.xls</code> file.</li>
           <li>The first row must contain column headers.</li>
         </ul>
         <p><strong>2. Ask a question</strong></p>
@@ -200,7 +200,7 @@
       <div class="header">
         <h1>Natural Language to SQL</h1>
         <p>
-          Upload a CSV dataset and ask questions in plain English — the AI
+          Upload a CSV or Excel dataset and ask questions in plain English — the AI
           generates and runs the SQL for you.
         </p>
       </div>
@@ -214,7 +214,7 @@
 
       <!-- Upload card -->
       <div class="card">
-        <input type="file" id="file-input" accept=".csv" />
+        <input type="file" id="file-input" accept=".csv,.xlsx,.xls" />
 
         <div id="drop-zone">
           <div class="upload-icon">
@@ -234,6 +234,7 @@
           <p>or click anywhere in this area to browse</p>
           <div class="badge-row">
             <span class="badge">CSV</span>
+            <span class="badge">Excel</span>
           </div>
         </div>
 
@@ -248,7 +249,7 @@
           <div class="req-title">Data Requirements</div>
           <ul>
             <li>First row must contain column headers.</li>
-            <li>Supports any CSV with text and numeric columns.</li>
+            <li>Supports CSV (.csv) and Excel (.xlsx, .xls) files with text and numeric columns.</li>
             <li>Descriptive column names improve matching accuracy.</li>
             <li>
               Large datasets work fine — only schema and sample values are held
