@@ -557,10 +557,19 @@
         word-break: break-word;
       }
 
+      /* ─── Content ─── */
+      .content {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 40px 32px 100px; /* bottom padding 60px থেকে 100px করা হয়েছে */
+      }
+
       /* ─── Nav bar ─── */
       .nav-bar {
-        position: sticky;
+        position: fixed;
         bottom: 0;
+        left: 0; /* ← যোগ করুন */
+        right: 0; /* ← যোগ করুন */
         background: #fff;
         border-top: 1px solid #e8e8e8;
         padding: 14px 32px;
