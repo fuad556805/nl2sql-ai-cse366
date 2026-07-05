@@ -93,7 +93,6 @@ nl2sql-ai/
 │   └── sample.csv                # Sample dataset for testing
 │
 ├── simulation.html               # Interactive pipeline visualiser (learning tool)
-├── research_paper.md             # Academic write-up
 ├── requirements.txt
 ├── Procfile
 └── render.yaml
@@ -212,4 +211,4 @@ SQL Executor         ← SQLite / PostgreSQL → (columns, rows)
 
 ## License
 
-MIT
+This project was developed as part of the CSE366 (Artificial Intelligence) course at East West University.
