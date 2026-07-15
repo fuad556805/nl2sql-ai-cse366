@@ -1,41 +1,68 @@
 <!-- templates/partials/help_modal.html -->
-    <div class="modal-overlay" id="help-modal">
-      <div class="modal-box">
-        <h2>Help &amp; Tips</h2>
-        <p><strong>1. Upload a dataset</strong></p>
-        <ul>
-          <li>
-            Drag &amp; drop or click to browse a <code>.csv</code>,
-            <code>.xlsx</code>, or <code>.xls</code> file.
-          </li>
-          <li>The first row must contain column headers.</li>
-        </ul>
-        <p><strong>2. Ask a question</strong></p>
-        <ul>
-          <li><code>show female patients older than 30</code></li>
-          <li><code>average purchase amount by location</code></li>
-          <li><code>top 5 highest salary</code></li>
-          <li><code>count students where district is Dhaka</code></li>
-        </ul>
-        <p><strong>3. Tips for best results</strong></p>
-        <ol>
-          <li>
-            Mention the column name in your question (e.g. "purchase amount",
-            "review score").
-          </li>
-          <li>
-            Use <code>average</code>, <code>total</code>, <code>maximum</code>,
-            <code>minimum</code> for aggregates.
-          </li>
-          <li>
-            Use <code>top N</code> / <code>lowest N</code> for ranked results.
-          </li>
-          <li>Use <code>by &lt;column&gt;</code> to group results.</li>
-        </ol>
-        <p>
-          If a question is too ambiguous, the app will show a clear error
-          instead of guessing.
-        </p>
-        <button class="modal-close" data-close="help-modal">Close</button>
-      </div>
-    </div>
+<div class="modal-overlay" id="help-modal">
+  <div class="modal-box">
+    <h2>Help &amp; Tips</h2>
+
+    <p><strong>1. Upload a Dataset</strong></p>
+    <ul>
+      <li>
+        Drag &amp; drop or click to browse a <code>.csv</code>,
+        <code>.xlsx</code>, or <code>.xls</code> file.
+      </li>
+      <li>The first row must contain column headers.</li>
+      <li>The dataset schema is detected automatically.</li>
+    </ul>
+
+    <p><strong>2. Example Questions</strong></p>
+    <ul>
+      <li><code>show female patients older than 30</code></li>
+      <li><code>average salary by department</code></li>
+      <li><code>top 5 highest salary</code></li>
+      <li><code>count students from Dhaka</code></li>
+      <li><code>total sales by region</code></li>
+      <li><code>age between 20 and 40</code></li>
+    </ul>
+
+    <p><strong>3. Supported Keywords</strong></p>
+    <ul>
+      <li><code>average</code>, <code>avg</code> → <code>AVG()</code></li>
+      <li><code>total</code>, <code>sum</code> → <code>SUM()</code></li>
+      <li><code>count</code>, <code>how many</code> → <code>COUNT()</code></li>
+      <li><code>maximum</code>, <code>max</code> → <code>MAX()</code></li>
+      <li><code>minimum</code>, <code>min</code> → <code>MIN()</code></li>
+      <li><code>highest</code> → <code>ORDER BY DESC</code></li>
+      <li><code>lowest</code> → <code>ORDER BY ASC</code></li>
+      <li><code>top N</code> → <code>LIMIT</code></li>
+      <li><code>by</code> → <code>GROUP BY</code></li>
+      <li><code>greater than</code>, <code>more than</code> → <code>&gt;</code></li>
+      <li><code>less than</code>, <code>below</code> → <code>&lt;</code></li>
+      <li><code>between</code> → <code>BETWEEN</code></li>
+      <li><code>is</code>, <code>equal to</code> → <code>=</code></li>
+    </ul>
+
+    <p><strong>4. Tips for Best Results</strong></p>
+    <ol>
+      <li>Use simple English questions.</li>
+      <li>Mention column names whenever possible.</li>
+      <li>Use <code>by &lt;column&gt;</code> for grouped results.</li>
+      <li>Use <code>top N</code> or <code>lowest N</code> for ranking.</li>
+      <li>Review the generated SQL before execution.</li>
+    </ol>
+
+    <p><strong>5. Current Limitations</strong></p>
+    <ul>
+      <li>English language only.</li>
+      <li>Single-table queries only.</li>
+      <li><code>OR</code> conditions are not supported.</li>
+      <li><code>JOIN</code> queries are not supported.</li>
+      <li>Natural language dates (e.g. <code>last month</code>) are not supported.</li>
+    </ul>
+
+    <p>
+      If a question is unclear or does not match the uploaded dataset,
+      the app will display an error instead of generating an incorrect SQL query.
+    </p>
+
+    <button class="modal-close" data-close="help-modal">Close</button>
+  </div>
+</div>
